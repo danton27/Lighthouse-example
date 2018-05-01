@@ -1,0 +1,24 @@
+type Article @model {
+    id: ID! @globalId
+    title: String!
+    body: String!
+    author: User!
+}
+
+type User @model {
+    id: ID! @globalId
+    name: String!
+    email: String!
+    articles: [Article] @hasMany(relation: "articles", type: "relay")
+}
+
+
+type Query {
+    articles: [Article]! @paginate(model: "Article", type: "connection")
+}
+
+type Mutation @group(middleware: ["auth:api"]) {
+    createArticle(title: String!, body: String!): Article
+    @create(model: "App\\Models\\Article")
+    @inject(context: "user.id", name: "author_id")
+}
